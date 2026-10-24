@@ -12,6 +12,7 @@ export class SvgDocument {
   get children():readonly Shape[]{return this.root.children;}
 
   add(shape:Shape,parentId?:string):void{
+    if(shape.id.length===0)throw new EditorError("id must not be empty");
     if(this.find(shape.id))throw new EditorError(`id already exists: ${shape.id}`);
     const parent=parentId===undefined?this.root:this.requireContainer(parentId);
     parent.add(shape);
@@ -31,11 +32,14 @@ export class SvgDocument {
   count():number{let n=0;const visit=(c:ContainerShape)=>{for(const s of c.children){n++;if(s instanceof ContainerShape)visit(s);}};visit(this.root);return n;}
 
   group(id:string,ids:string[]):ContainerShape{
+    if(id.length===0)throw new EditorError("id must not be empty");
     if(this.find(id))throw new EditorError(`id already exists: ${id}`);
     if(ids.length===0)throw new EditorError("group requires at least one shape");
     const selected=ids.map((value)=>this.require(value));
     if(new Set(selected).size!==selected.length)throw new EditorError("duplicate shape in group");
     for(const a of selected)for(const b of selected){if(a!==b&&a instanceof ContainerShape&&a.contains(b))throw new EditorError(`cannot group a container into its own descendant: ${a.id}`);}
+    const order:Shape[]=[];const collect=(container:ContainerShape):void=>{for(const child of container.children){order.push(child);if(child instanceof ContainerShape)collect(child);}};collect(this.root);
+    selected.sort((a,b)=>order.indexOf(a)-order.indexOf(b));
     const anchor=selected[0];const parent=anchor.parent!;const index=parent.indexOf(anchor);const group=new ContainerShape(id);parent.add(group,index);
     for(const shape of selected)group.add(shape);
     return group;

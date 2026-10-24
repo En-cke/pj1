@@ -23,6 +23,16 @@ export class SvgParser {
     document.sourcePath = sourcePath;
     const warnings: string[] = [];
     const counters = new Map<string, number>();
+    const reserved = new Set<string>();
+    const reserveExplicitIds = (element: Element): void => {
+      const type=element.tagName;
+      if (["rect","circle","ellipse","line","text","g"].includes(type)) {
+        const id=element.getAttribute("id")??"";
+        if(id){if(reserved.has(id))throw new EditorError(`id already exists: ${id}`);reserved.add(id);}
+      }
+      for(let node=element.firstChild;node;node=node.nextSibling){if(node.nodeType===1)reserveExplicitIds(node as Element);}
+    };
+    reserveExplicitIds(root);
 
     const visit = (element: Element, parentId?: string): void => {
       const type = element.tagName;
@@ -30,9 +40,10 @@ export class SvgParser {
       let id = element.getAttribute("id") ?? "";
       if (!id) {
         let next = (counters.get(type) ?? 0) + 1;
-        while (document.find(`${type}${next}`)) next++;
+        while (reserved.has(`${type}${next}`)) next++;
         counters.set(type, next);
         id = `${type}${next}`;
+        reserved.add(id);
         warnings.push(`warning: assigned id ${id} to unnamed <${type}>`);
       }
       const attr = (name:string, fallback="0") => element.getAttribute(name) ?? fallback;
@@ -57,6 +68,6 @@ export class SvgParser {
   }
 
   private dimension(raw:string|null,fallback:number):number{
-    if(raw===null)return fallback;const value=Number.parseFloat(raw);if(!Number.isFinite(value)||value<=0)throw new EditorError(`invalid canvas dimension: ${raw}`);return value;
+    if(raw===null||raw.trim()==="")return fallback;const value=Number.parseFloat(raw);if(!Number.isFinite(value)||value<=0)throw new EditorError(`invalid canvas dimension: ${raw}`);return value;
   }
 }

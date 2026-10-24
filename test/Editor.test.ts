@@ -53,6 +53,11 @@ describe("SVG Editor CLI",()=>{
     expect(await run("ungroup inner")).toContain("3 children promoted");
   });
 
+  it("分组时保持图形原有相对顺序",async()=>{
+    await run("init");await run("create rect a 0 0 1 1");await run("create rect b 0 0 1 1");await run("create rect c 0 0 1 1");
+    await run("group kept c a");const tree=await run("tree kept");expect(tree.indexOf("rect#a")).toBeLessThan(tree.indexOf("rect#c"));
+  });
+
   it("拒绝循环分组和顶层解组",async()=>{
     await run("init");await run("create g g1");await run("create g g2 in g1");
     expect(await run("group bad g1 g2")).toBe("error: cannot group a container into its own descendant: g1");
@@ -89,8 +94,15 @@ describe("SVG Editor CLI",()=>{
     const result=await run(`read "${file}"`);expect(result).toContain("warning: assigned id rect1");expect(result).toContain("warning: assigned id circle1");expect(await run("tree")).toContain("circle#circle1");
   });
 
+  it("自动编号会避开后续显式 ID",async()=>{
+    const dir=await mkdtemp(join(tmpdir(),"svg-editor-"));temporary.push(dir);const file=join(dir,"ids.svg");
+    await writeFile(file,'<svg xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="1" height="1"/><rect id="rect1" x="1" y="1" width="1" height="1"/></svg>');
+    expect(await run(`read "${file}"`)).toContain("assigned id rect2");
+  });
+
   it("处理注释、引号和常见错误",async()=>{
     expect(await run("# replay comment")).toBe("");expect(await run("tree")).toBe("error: no document. use 'init' or 'read' first");expect(await run("wat")).toBe("error: unknown command: wat");
     await run("init");expect(await run('create text t 0 0 "not closed')).toBe("error: unterminated quoted string");expect(await run("scale none 0")).toBe("error: scale factor must be positive");
+    expect(await run("create box n1 0 0 10 10 title")).toBe("error: unknown shape type: box (is the plugin loaded?)");
   });
 });
