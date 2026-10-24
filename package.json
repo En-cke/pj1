@@ -2,6 +2,7 @@
   "name": "svg-editor-cli",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.1.0",
   "description": "面向对象的 CLI SVG 编辑器",
   "type": "module",
   "scripts": {
