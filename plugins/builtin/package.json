@@ -1,5 +1,6 @@
 {
   "name": "@svgframe/builtin",
+  "type": "module",
   "private": true,
   "main": "index.js",
   "contributes": {
