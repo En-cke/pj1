@@ -1,5 +1,5 @@
-import { Format } from "./Format.js";
-import { Shape } from "./Shape.js";
+import { Format } from "../../../src/api.js";
+import { Shape } from "../../../src/api.js";
 
 export class RectShape extends Shape {
   constructor(id: string, private x: number, private y: number, private width: number, private height: number, fill?: string) {

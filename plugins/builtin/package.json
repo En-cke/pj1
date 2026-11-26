@@ -1,0 +1,36 @@
+{
+  "name": "@svgframe/builtin",
+  "private": true,
+  "main": "index.js",
+  "contributes": {
+    "shapes": [
+      "rect",
+      "circle",
+      "ellipse",
+      "line",
+      "text",
+      "g"
+    ],
+    "commands": [
+      "init",
+      "read",
+      "save",
+      "canvas",
+      "create",
+      "delete",
+      "move",
+      "scale",
+      "set",
+      "group",
+      "ungroup",
+      "addto",
+      "front",
+      "back",
+      "tree",
+      "show",
+      "help",
+      "undo",
+      "redo"
+    ]
+  }
+}

@@ -6,8 +6,8 @@
   "description": "面向对象的 CLI SVG 编辑器",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "cli": "tsx src/cli.ts",
+    "build": "tsc -p tsconfig.json && node scripts/copy-plugin-manifests.mjs",
+    "cli": "node dist/src/cli.js",
     "test": "vitest run",
     "check": "npm run build && npm test"
   },

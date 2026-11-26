@@ -1,31 +1,33 @@
-import { CircleShape } from "./CircleShape.js";
-import { ContainerShape } from "./ContainerShape.js";
+import type { ShapeElement, ShapeProvider } from "../extension/contracts.js";
+import type { Registry } from "../extension/Registry.js";
 import { EditorError } from "./EditorError.js";
-import { EllipseShape } from "./EllipseShape.js";
-import { LineShape } from "./LineShape.js";
-import { RectShape } from "./RectShape.js";
-import { Shape } from "./Shape.js";
-import { TextShape } from "./TextShape.js";
+import type { Shape } from "./Shape.js";
 
 export class ShapeFactory {
-  create(type: string, id: string, args: string[]): Shape {
-    const numeric = (index: number): number => {
-      const value = Number(args[index]);
-      if (!Number.isFinite(value)) throw new EditorError(`invalid number: ${args[index] ?? "missing"}`);
-      return value;
-    };
-    switch (type) {
-      case "rect": this.expect(type,args,4,5); return new RectShape(id,numeric(0),numeric(1),numeric(2),numeric(3),args[4]);
-      case "circle": this.expect(type,args,3,4); return new CircleShape(id,numeric(0),numeric(1),numeric(2),args[3]);
-      case "ellipse": this.expect(type,args,4,5); return new EllipseShape(id,numeric(0),numeric(1),numeric(2),numeric(3),args[4]);
-      case "line": this.expect(type,args,4,5); return new LineShape(id,numeric(0),numeric(1),numeric(2),numeric(3),args[4]);
-      case "text": this.expect(type,args,3,3); return new TextShape(id,numeric(0),numeric(1),args[2]);
-      case "g": this.expect(type,args,0,0); return new ContainerShape(id);
-      default: throw new EditorError(`unknown shape type: ${type} (is the plugin loaded?)`);
-    }
+  constructor(private readonly registry: Registry) {}
+
+  create(type: string, id: string, args: readonly string[]): Shape {
+    const provider = this.registry.get("shapes", type);
+    if (!provider) throw new EditorError("unknown shape type: " + type + " (is the plugin loaded?)");
+    return this.check(provider, id, provider.create(id, args, this.create.bind(this)));
   }
 
-  private expect(type:string,args:string[],min:number,max:number):void{
-    if(args.length<min||args.length>max)throw new EditorError(`invalid parameters for ${type}`);
+  providerFor(element: ShapeElement): ShapeProvider | undefined {
+    const marker = element.getAttribute("data-kind");
+    const variant = marker ? this.registry.get("shapes", marker) : undefined;
+    if (variant?.svgTag === element.tagName) return variant;
+    const plain = this.registry.get("shapes", element.tagName);
+    return plain?.svgTag === element.tagName ? plain : undefined;
+  }
+
+  read(provider: ShapeProvider, id: string, element: ShapeElement, children: Shape[]): Shape {
+    return this.check(provider, id, provider.read(id, element, children));
+  }
+
+  private check(provider: ShapeProvider, id: string, shape: Shape): Shape {
+    if (!shape || shape.id !== id || shape.kind !== provider.name || shape.tag !== provider.svgTag) {
+      throw new EditorError("invalid shape from provider: " + provider.name);
+    }
+    return shape;
   }
 }

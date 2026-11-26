@@ -1,5 +1,5 @@
-import { Format } from "./Format.js";
-import { Shape } from "./Shape.js";
+import { Format } from "../../../src/api.js";
+import { Shape } from "../../../src/api.js";
 
 export class EllipseShape extends Shape {
   constructor(id: string, private cx: number, private cy: number, private rx: number, private ry: number, fill?: string) { super(id,"ellipse"); if(fill!==undefined)this.styles.set("fill",fill); }

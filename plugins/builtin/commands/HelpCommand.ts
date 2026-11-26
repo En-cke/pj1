@@ -1,7 +1,8 @@
-import type { Command } from "./Command.js";
+import type { CommandInvocation } from "../../../src/api.js";
 
-export class HelpCommand implements Command {
+export class HelpCommand implements CommandInvocation {
   readonly kind="view" as const;
+  constructor(private readonly pluginHelp: readonly string[], private readonly extraShapes: readonly string[]) {}
   execute():string{return [
     "Document: init [w] [h] | read <file.svg> | save [file.svg] | canvas [w] [h]",
     "Create:   create <rect|circle|ellipse|line|text|g> <id> [params...] [in <gid>]",
@@ -10,5 +11,7 @@ export class HelpCommand implements Command {
     "          addto <gid> <id> | front <id> | back <id>",
     "Display:  tree [id] | show <id> | help",
     "History:  undo | redo",
+    ...this.pluginHelp,
+    ...this.extraShapes.map(name => "Shape:    " + name),
   ].join("\n");}
 }

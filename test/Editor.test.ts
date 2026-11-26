@@ -2,13 +2,13 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
-import { createEditor } from "../src/editor/createEditor.js";
+import { createEditor } from "../src/host/createEditor.js";
 import type { Editor } from "../src/editor/Editor.js";
 
 describe("SVG Editor CLI",()=>{
   let editor:Editor;
   const temporary:string[]=[];
-  beforeEach(()=>{editor=createEditor();});
+  beforeEach(async()=>{editor=await createEditor();});
   afterAll(async()=>{for(const path of temporary)await rm(path,{recursive:true,force:true});});
   const run=(line:string)=>editor.executeLine(line);
 
@@ -85,7 +85,7 @@ describe("SVG Editor CLI",()=>{
     const dir=await mkdtemp(join(tmpdir(),"svg-editor-"));temporary.push(dir);const file=join(dir,"roundtrip.svg");
     await run("init 400 200");await run("create g flow");await run("create rect start 30 70 120 60 #4a90d9 in flow");await run('create text title 50 100 "A&B" in flow');await run(`save "${file}"`);
     const xml=await readFile(file,"utf8");expect(xml).toContain("A&amp;B");
-    const second=createEditor();expect(await second.executeLine(`read "${file}"`)).toContain("(3 elements)");expect(await second.executeLine("tree")).toContain('"A&B"');
+    const second=await createEditor();expect(await second.executeLine(`read "${file}"`)).toContain("(3 elements)");expect(await second.executeLine("tree")).toContain('"A&B"');
   });
 
   it("读入外部 SVG 时为匿名元素补 ID",async()=>{

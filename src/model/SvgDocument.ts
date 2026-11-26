@@ -12,8 +12,16 @@ export class SvgDocument {
   get children():readonly Shape[]{return this.root.children;}
 
   add(shape:Shape,parentId?:string):void{
-    if(shape.id.length===0)throw new EditorError("id must not be empty");
-    if(this.find(shape.id))throw new EditorError(`id already exists: ${shape.id}`);
+    const ids = new Set<string>();
+    const check = (candidate: Shape): void => {
+      if (!candidate.id) throw new EditorError("id must not be empty");
+      if (ids.has(candidate.id) || this.find(candidate.id)) {
+        throw new EditorError("id already exists: " + candidate.id);
+      }
+      ids.add(candidate.id);
+      if (candidate instanceof ContainerShape) candidate.children.forEach(check);
+    };
+    check(shape);
     const parent=parentId===undefined?this.root:this.requireContainer(parentId);
     parent.add(shape);
   }
@@ -47,6 +55,7 @@ export class SvgDocument {
 
   ungroup(id:string):number{
     const group=this.requireContainer(id);const parent=group.parent!;
+    if (!group.canUngroup) throw new EditorError("cannot ungroup " + group.kind + ": " + id);
     if(parent===this.root)throw new EditorError(`cannot ungroup top-level container: ${id}`);
     const index=parent.indexOf(group);const children=[...group.children];parent.remove(group);
     children.forEach((child,offset)=>parent.add(child,index+offset));return children.length;
@@ -60,15 +69,35 @@ export class SvgDocument {
 
   reorder(id:string,front:boolean):void{const shape=this.require(id);const parent=shape.parent!;parent.remove(shape);parent.add(shape,front?parent.children.length:0);}
 
-  tree(id?:string):string{
-    if(id===undefined){const lines=[`svg (${Format.number(this.width)}x${Format.number(this.height)})`];this.appendTree(lines,this.root,"",true);return lines.join("\n");}
-    const shape=this.require(id);const lines=[shape.summary()];if(shape instanceof ContainerShape)this.appendTree(lines,shape,"",true);return lines.join("\n");
+  tree(id?: string, suffix: (shape?: Shape) => string = () => ""): string {
+    const shape = id === undefined ? undefined : this.require(id);
+    const title = shape?.summary() ?? "svg (" + Format.number(this.width) + "x" + Format.number(this.height) + ")";
+    const lines = [title + suffix(shape)];
+    const container = shape ?? this.root;
+    if (container instanceof ContainerShape) this.appendTree(lines, container, "", suffix);
+    return lines.join("\n");
   }
 
   show(id:string):string{const shape=this.require(id);const parent=shape.parent===this.root?"svg":`g#${shape.parent!.id}`;return [`${shape.tag}#${shape.id}  parent=${parent}`,...shape.detailLines().map((line)=>`  ${line}`)].join("\n");}
 
-  private appendTree(lines:string[],container:ContainerShape,prefix:string,skipSelf:boolean):void{
-    const children=container.children;children.forEach((shape,index)=>{const last=index===children.length-1;lines.push(`${prefix}${last?"└── ":"├── "}${shape.summary()}`);if(shape instanceof ContainerShape)this.appendTree(lines,shape,`${prefix}${last?"    ":"│   "}`,false);});
+  private appendTree(
+    lines: string[], container: ContainerShape, prefix: string, suffix: (shape: Shape) => string,
+  ): void {
+    container.children.forEach((shape, index, children) => {
+      const last = index === children.length - 1;
+      lines.push(prefix + (last ? "└── " : "├── ") + shape.summary() + suffix(shape));
+      if (shape instanceof ContainerShape) {
+        this.appendTree(lines, shape, prefix + (last ? "    " : "│   "), suffix);
+      }
+    });
+  }
+
+  validate(): void {
+    const visit = (shape: Shape): void => {
+      shape.validate();
+      if (shape instanceof ContainerShape) shape.children.forEach(visit);
+    };
+    this.children.forEach(visit);
   }
 
   toSvg():string{const content=this.root.children.map((shape)=>shape.toSvg(1)).join("\n");return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${Format.number(this.width)}" height="${Format.number(this.height)}" viewBox="0 0 ${Format.number(this.width)} ${Format.number(this.height)}">${content?`\n${content}\n`:""}</svg>\n`;}

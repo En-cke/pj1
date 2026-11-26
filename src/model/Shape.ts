@@ -12,6 +12,10 @@ export abstract class Shape {
     public readonly tag: string,
   ) {}
 
+  get kind(): string { return this.tag; }
+
+  validate(): void {}
+
   get parent(): ContainerShape | null {
     return this.owner;
   }

@@ -1,10 +1,20 @@
 import { createInterface as createPromiseInterface } from "node:readline/promises";
 import { createInterface as createLineInterface } from "node:readline";
 import { stdin as input, stdout as output } from "node:process";
-import { createEditor } from "./editor/createEditor.js";
+import { createEditor, type Assembly } from "./host/createEditor.js";
 
 async function main():Promise<void>{
-  const editor=createEditor();
+  const args = process.argv.slice(2);
+  let assembly: Assembly;
+  if (!args.length) assembly = { mode: "code" };
+  else if (args.length === 1 && args[0] === "--baseline") assembly = { mode: "baseline" };
+  else if (args.length === 2 && args[0] === "--config") assembly = { mode: "config", path: args[1] };
+  else {
+    console.log("error: usage: svg-editor [--baseline | --config <file>]");
+    process.exitCode = 1;
+    return;
+  }
+  const editor = await createEditor(assembly);
   console.log("svg-editor 0.1 — type 'help' for commands");
   if(!input.isTTY){
     const lines=createLineInterface({input,crlfDelay:Infinity});

@@ -1,7 +1,7 @@
-import { EditorError } from "../model/EditorError.js";
-import { Format } from "../model/Format.js";
-import type { SvgDocument } from "../model/SvgDocument.js";
-import { EditingCommand } from "./EditingCommand.js";
+import { EditorError } from "../../../src/api.js";
+import { Format } from "../../../src/api.js";
+import type { SvgDocument } from "../../../src/api.js";
+import { EditingCommand } from "../../../src/api.js";
 
 export class ScaleCommand extends EditingCommand {
   constructor(private readonly args:string[]){super();}

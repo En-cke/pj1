@@ -1,11 +1,22 @@
-import type { UndoableCommand } from "../command/Command.js";
+import type { CommandContext, UndoableCommand } from "../command/Command.js";
 import type { CommandDispatcher } from "./CommandDispatcher.js";
 import { EditorError } from "../model/EditorError.js";
 import type { SvgDocument } from "../model/SvgDocument.js";
 import type { Tokenizer } from "../parser/Tokenizer.js";
 
-export class Editor {
-  document?:SvgDocument;
+export class Editor implements CommandContext {
+  private activeDocument?: SvgDocument;
+  private savedDocument?: SvgDocument;
+
+  get document(): SvgDocument | undefined { return this.activeDocument; }
+  set document(document: SvgDocument | undefined) {
+    this.activeDocument = document;
+    this.savedDocument = undefined;
+  }
+
+  get saved(): SvgDocument | undefined { return this.savedDocument; }
+
+  markSaved(): void { this.savedDocument = this.requireDocument().clone(); }
   private readonly undoStack:UndoableCommand[]=[];
   private readonly redoStack:UndoableCommand[]=[];
   private historyBlocked=true;
@@ -18,6 +29,7 @@ export class Editor {
     try{
       const tokens=this.tokenizer.tokenize(line);if(tokens.length===0)return "";
       const command=this.dispatcher.dispatch(tokens);const result=await command.execute(this);
+      if (typeof result !== "string") throw new EditorError("command must return text");
       if(command.kind==="edit"){
         if(this.historyBlocked){this.undoStack.length=0;this.redoStack.length=0;this.historyBlocked=false;}
         this.undoStack.push(command as UndoableCommand);this.redoStack.length=0;

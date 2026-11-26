@@ -8,6 +8,8 @@ export class ContainerShape extends Shape {
     super(id, "g");
   }
 
+  get canUngroup(): boolean { return true; }
+
   get children(): readonly Shape[] {
     return this.items;
   }
@@ -53,11 +55,13 @@ export class ContainerShape extends Shape {
 
   toSvg(indent: number): string {
     const pad = "  ".repeat(indent);
-    const attrs = this.styleEntries().map(([k, v]) => ` ${k}="${Format.xml(v)}"`).join("");
+    const attrs = this.svgMetadata() + this.styleEntries().map(([k, v]) => ` ${k}="${Format.xml(v)}"`).join("");
     if (this.items.length === 0) return `${pad}<g id="${Format.xml(this.id)}"${attrs}/>`;
     const content = this.items.map((item) => item.toSvg(indent + 1)).join("\n");
     return `${pad}<g id="${Format.xml(this.id)}"${attrs}>\n${content}\n${pad}</g>`;
   }
+
+  protected svgMetadata(): string { return ""; }
 
   clone(): ContainerShape {
     const result = new ContainerShape(this.id);

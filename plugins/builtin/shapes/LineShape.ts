@@ -1,5 +1,5 @@
-import { Format } from "./Format.js";
-import { Shape } from "./Shape.js";
+import { Format } from "../../../src/api.js";
+import { Shape } from "../../../src/api.js";
 
 export class LineShape extends Shape {
   constructor(id:string,private x1:number,private y1:number,private x2:number,private y2:number,stroke?:string){super(id,"line");if(stroke!==undefined)this.styles.set("stroke",stroke);}
