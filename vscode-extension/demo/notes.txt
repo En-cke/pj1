@@ -1,0 +1,1 @@
+Compare this plain text file and the assets.svg directory with example.svg.
