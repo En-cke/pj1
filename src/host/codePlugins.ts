@@ -1,4 +1,12 @@
+import { createRequire } from "node:module";
+import dir from "../../plugins/dir/index.js";
+import stats from "../../plugins/stats/index.js";
 import type { Registry } from "../extension/Registry.js";
-import type { Report } from "./pluginLoader.js";
+import { installPlugin, type Report } from "./pluginLoader.js";
 
-export async function codePlugins(_registry: Registry, _report: Report): Promise<void> {}
+const require = createRequire(import.meta.url);
+
+export async function codePlugins(registry: Registry, report: Report): Promise<void> {
+  await installPlugin(registry, stats, require("../../plugins/stats/package.json"), report);
+  await installPlugin(registry, dir, require("../../plugins/dir/package.json"), report);
+}

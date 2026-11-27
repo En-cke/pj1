@@ -1,3 +1,10 @@
 {
-  "plugins": []
+  "plugins": [
+    {
+      "module": "./dist/plugins/stats"
+    },
+    {
+      "module": "./dist/plugins/dir"
+    }
+  ]
 }
