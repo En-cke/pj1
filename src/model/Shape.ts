@@ -14,6 +14,14 @@ export abstract class Shape {
 
   get kind(): string { return this.tag; }
 
+  get textContent(): string | undefined { return undefined; }
+
+  get commandName(): string { return this.kind + "#" + this.id; }
+
+  get creationDetails(): string { return ""; }
+
+  get undoMoveName(): string { return this.id; }
+
   validate(): void {}
 
   get parent(): ContainerShape | null {

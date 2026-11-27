@@ -29,10 +29,15 @@ export interface TreeDecorator {
   label(row: TreeRow): string | undefined;
 }
 
+export interface AttributeChange {
+  readonly message: string;
+  readonly undoMessage?: string;
+}
+
 export interface AttributeHandler {
   readonly name: string;
   handles(shape: Shape, attr: string): boolean;
-  apply(shape: Shape, attr: string, value: string): void;
+  apply(shape: Shape, attr: string, value: string): AttributeChange | void;
 }
 
 export interface Contributions {

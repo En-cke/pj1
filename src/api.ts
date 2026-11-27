@@ -2,7 +2,7 @@ export type {
   Command, CommandContext, CommandInvocation, CommandKind, UndoableCommand,
 } from "./command/Command.js";
 export type {
-  AttributeHandler, Category, Contributions, CreateShape, Manifest, Plugin,
+  AttributeChange, AttributeHandler, Category, Contributions, CreateShape, Manifest, Plugin,
   PluginContext, ShapeElement, ShapeProvider, TreeDecorator, TreeRow,
 } from "./extension/contracts.js";
 export { ContainerShape } from "./model/ContainerShape.js";

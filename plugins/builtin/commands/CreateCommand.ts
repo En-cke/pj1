@@ -11,7 +11,8 @@ export class CreateCommand extends EditingCommand {
     const [type,id,...raw]=this.args;let parentId:string|undefined;let params=raw;
     if(raw.length>=2&&raw.at(-2)==="in"){parentId=raw.at(-1);params=raw.slice(0,-2);}
     const shape=this.create(type,id,params);document.add(shape,parentId);
-    return `${shape.tag}#${shape.id} created${parentId?` in g#${parentId}`:""}`;
+    const destination = parentId ? " in g#" + parentId : "";
+    return shape.commandName + " created" + destination + shape.creationDetails;
   }
   protected undoResult():string{return "created shape removed";}
 }

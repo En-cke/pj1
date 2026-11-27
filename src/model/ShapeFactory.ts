@@ -1,7 +1,7 @@
 import type { ShapeElement, ShapeProvider } from "../extension/contracts.js";
 import type { Registry } from "../extension/Registry.js";
 import { EditorError } from "./EditorError.js";
-import type { Shape } from "./Shape.js";
+import { Shape } from "./Shape.js";
 
 export class ShapeFactory {
   constructor(private readonly registry: Registry) {}
@@ -25,7 +25,7 @@ export class ShapeFactory {
   }
 
   private check(provider: ShapeProvider, id: string, shape: Shape): Shape {
-    if (!shape || shape.id !== id || shape.kind !== provider.name || shape.tag !== provider.svgTag) {
+    if (!(shape instanceof Shape) || shape.id !== id || shape.kind !== provider.name || shape.tag !== provider.svgTag) {
       throw new EditorError("invalid shape from provider: " + provider.name);
     }
     return shape;

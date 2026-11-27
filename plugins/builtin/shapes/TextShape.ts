@@ -3,6 +3,8 @@ import { Shape } from "../../../src/api.js";
 
 export class TextShape extends Shape {
   constructor(id:string,private x:number,private y:number,private content:string){super(id,"text");}
+  override get textContent(): string { return this.content; }
+
   move(dx:number,dy:number):void{this.x+=dx;this.y+=dy;}
   scale(factor:number):void{this.x*=factor;this.y*=factor;}
   summary():string{return `text#${this.id}  (${Format.number(this.x)},${Format.number(this.y)}) "${this.content}"${this.styleSummary()?` ${this.styleSummary()}`:""}`;}

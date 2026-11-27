@@ -55,7 +55,7 @@ export class SvgDocument {
 
   ungroup(id:string):number{
     const group=this.requireContainer(id);const parent=group.parent!;
-    if (!group.canUngroup) throw new EditorError("cannot ungroup " + group.kind + ": " + id);
+    if (!group.canUngroup) throw new EditorError("cannot ungroup composite shape: " + id);
     if(parent===this.root)throw new EditorError(`cannot ungroup top-level container: ${id}`);
     const index=parent.indexOf(group);const children=[...group.children];parent.remove(group);
     children.forEach((child,offset)=>parent.add(child,index+offset));return children.length;

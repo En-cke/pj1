@@ -4,6 +4,6 @@ import { EditingCommand } from "../../../src/api.js";
 
 export class DeleteCommand extends EditingCommand {
   constructor(private readonly args:string[]){super();}
-  protected apply(document:SvgDocument):string{if(this.args.length!==1)throw new EditorError("usage: delete <id>");const shape=document.remove(this.args[0]);return `${shape.tag}#${shape.id} deleted`;}
+  protected apply(document:SvgDocument):string{if(this.args.length!==1)throw new EditorError("usage: delete <id>");const shape=document.remove(this.args[0]);return `${shape.commandName} deleted`;}
   protected undoResult():string{return "deleted shape restored";}
 }
