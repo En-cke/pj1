@@ -1,0 +1,43 @@
+svg-editor 0.1 — type 'help' for commands
+[DIR]  docs
+[DIR]  plugins
+[FILE]  .keep
+[FILE]  notes.txt
+[FILE]  other.svg
+error: usage: dir
+error: no document. use 'init' or 'read' first
+canvas 800x600 created
+(total 0, containers 0)
+rect#r created
+g#grouping created
+circle#c created in g#grouping
+box#n created in g#grouping (g#n + rect#n-rect + text#n-label)
+rect: 2  circle: 1  text: 1  (total 4, containers 2)
+Document: init [w] [h] | read <file.svg> | save [file.svg] | canvas [w] [h]
+Create:   create <rect|circle|ellipse|line|text|g> <id> [params...] [in <gid>]
+Edit:     delete <id> | move <id> <dx> <dy> | scale <id> <factor>
+          set <id> <attr> <value> | group <gid> <id...> | ungroup <gid>
+          addto <gid> <id> | front <id> | back <id>
+Display:  tree [id] | show <id> | help
+History:  undo | redo
+Plugin:   stats — count leaf shapes and containers
+Plugin:   dir — list the working directory
+Shape:    box
+rect#r moved by (1,0)
+r moved back by (-1,0)
+[DIR]  docs
+[DIR]  plugins
+[FILE]  .keep
+[FILE]  notes.txt
+[FILE]  other.svg
+rect#r moved by (1,0)
+rect#r  parent=svg
+  x=1 y=0 width=30 height=20
+warning: assigned id rect1 to unnamed <rect>
+read other.svg (7 elements)
+[DIR]  docs
+[DIR]  plugins
+[FILE]  .keep
+[FILE]  notes.txt
+[FILE]  other.svg
+rect: 2  text: 1  circle: 2  ellipse: 1  (total 6, containers 1)

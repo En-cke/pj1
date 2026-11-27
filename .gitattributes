@@ -1,0 +1,2 @@
+doc/transcript/*.txt text eol=lf
+doc/transcript/*.svg text eol=lf

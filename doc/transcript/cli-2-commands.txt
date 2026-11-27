@@ -1,0 +1,21 @@
+# Same fixed directory for code and config runs. Output is captured outside it.
+dir
+dir surplus
+stats
+init
+stats
+create rect r 0 0 30 20
+create g grouping
+create circle c 30 20 5 in grouping
+create box n 120 100 160 60 "标题" in grouping
+stats
+help
+move r 1 0
+undo
+dir
+redo
+show r
+read other.svg
+dir
+stats
+quit

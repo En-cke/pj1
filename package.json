@@ -9,7 +9,9 @@
     "build": "tsc -p tsconfig.json && node scripts/copy-plugin-manifests.mjs",
     "cli": "node dist/src/cli.js",
     "test": "vitest run",
-    "check": "npm run build && npm test"
+    "check": "npm run build && npm test && npm run test:loader && npm run verify",
+    "test:loader": "node --test test/plugin-loader.test.mjs",
+    "verify": "node scripts/verify-transcripts.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
