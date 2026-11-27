@@ -5,6 +5,9 @@
     },
     {
       "module": "./dist/plugins/dir"
+    },
+    {
+      "module": "./dist/plugins/box"
     }
   ]
 }
