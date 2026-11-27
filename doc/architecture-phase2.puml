@@ -1,0 +1,20 @@
+@startuml
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 16
+left to right direction
+rectangle "组合根\n代码 / JSON" as Host
+rectangle "加载与注册事务\n清单校验" as Loader
+rectangle "内核\n分发 / 创建 / 读回 / set / tree" as Core
+rectangle "注册表 + 四个扩展接口" as APIs
+rectangle "插件\nbuiltin / stats / dir / box / tree-star" as Plugins
+rectangle "Node 目录适配器" as FS
+Host --> Loader : installPlugin
+Host --> Core : createEditor
+Loader --> APIs : commit
+Loader --> Plugins : activate
+Core --> APIs : 查询及调用
+Plugins ..> APIs : 实现
+Plugins --> FS : dir
+@enduml

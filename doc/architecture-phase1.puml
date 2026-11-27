@@ -1,0 +1,19 @@
+@startuml
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 16
+rectangle "CLI / createEditor" as Host
+rectangle "Editor → CommandDispatcher" as Editor
+rectangle "固定命令表" as Commands
+rectangle "SvgParser\n按图形名读取参数" as Parser
+rectangle "ShapeFactory\n按图形名创建" as Factory
+rectangle "SvgDocument\nComposite" as Doc
+Host -right-> Editor
+Editor -right-> Commands
+Commands -down-> Parser : read
+Commands -down-> Factory : create
+Commands -down-> Doc : edit / tree
+Parser -right-> Factory : rebuild
+Factory -right-> Doc : Shape
+@enduml
