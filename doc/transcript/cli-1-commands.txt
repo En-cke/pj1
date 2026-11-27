@@ -1,0 +1,33 @@
+# Full built-in command surface.
+help
+init
+canvas
+canvas 640 480
+create g outer
+create g inner in outer
+create line l 0 0 2 2 black in inner
+create ellipse e 10 10 3 5 green in inner
+create rect r 5 5 10 10
+create circle c 10 10 2 blue
+create text t 2 4 "全命令回归"
+set l stroke-width 2
+addto inner r
+front l
+back r
+move r 5 0
+scale e 2
+undo
+redo
+show e
+tree inner
+ungroup inner
+group gathered e l
+delete t
+undo
+redo
+show t
+save all.svg
+undo
+read other.svg
+tree
+quit

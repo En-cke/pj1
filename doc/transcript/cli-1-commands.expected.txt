@@ -1,0 +1,51 @@
+svg-editor 0.1 — type 'help' for commands
+Document: init [w] [h] | read <file.svg> | save [file.svg] | canvas [w] [h]
+Create:   create <rect|circle|ellipse|line|text|g> <id> [params...] [in <gid>]
+Edit:     delete <id> | move <id> <dx> <dy> | scale <id> <factor>
+          set <id> <attr> <value> | group <gid> <id...> | ungroup <gid>
+          addto <gid> <id> | front <id> | back <id>
+Display:  tree [id] | show <id> | help
+History:  undo | redo
+canvas 800x600 created
+canvas 800x600
+canvas resized to 640x480
+g#outer created
+g#inner created in g#outer
+line#l created in g#inner
+ellipse#e created in g#inner
+rect#r created
+circle#c created
+text#t created
+line#l updated: stroke-width="2"
+r moved into g#inner
+l moved to front
+r moved to back
+rect#r moved by (5,0)
+ellipse#e scaled by 2
+scale undone
+ellipse#e scaled by 2
+ellipse#e  parent=g#inner
+  cx=20 cy=20 rx=6 ry=10
+  fill=green
+g#inner
+├── rect#r  x=10 y=5 w=10 h=10
+├── ellipse#e  cx=20 cy=20 rx=6 ry=10 fill=green
+└── line#l  (0,0) -> (2,2) stroke=black stroke-width=2
+g#inner ungrouped (3 children promoted)
+g#gathered created with 2 children
+text#t deleted
+deleted shape restored
+text#t deleted
+error: no such shape: t
+saved to all.svg (6 elements)
+error: undo not allowed after io command
+warning: assigned id rect1 to unnamed <rect>
+read other.svg (7 elements)
+svg (400x300)
+├── rect#rect1  x=0 y=0 w=400 h=300 fill=#ffffff
+├── text#t1  (10,290) "imported"
+├── circle#c1  cx=50 cy=50 r=10
+├── g#g1
+│   ├── rect#r2  x=0 y=0 w=10 h=10
+│   └── circle#c2  cx=5 cy=5 r=2
+└── ellipse#e1  cx=1 cy=2 rx=3 ry=4

@@ -62,7 +62,7 @@ try {
   writeFileSync(join(cwd, ".keep"), "");
   writeFileSync(join(cwd, "notes.txt"), "fixed directory listing fixture\n");
 
-  for (const [name, outputFile] of [["cli-1", "demo.svg"], ["cli-1-flow", "flowchart.svg"]]) {
+  for (const [name, outputFile] of [["cli-1", "demo.svg"], ["cli-1-flow", "flowchart.svg"], ["cli-1-commands", "all.svg"]]) {
     const old = run([tsx, join(baseline, "src", "cli.ts")], name, outputFile);
     assert.deepEqual(run([cli, "--baseline"], name, outputFile), old, name + " baseline vs final");
     assert.deepEqual(run([cli, "--config", baselineConfig], name, outputFile), old, name + " empty config vs final");
