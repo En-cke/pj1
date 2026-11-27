@@ -1,9 +1,15 @@
 import {
-  ContainerShape, EditorError, type AttributeHandler, type CreateShape, type Shape, type ShapeElement, type ShapeProvider,
+  ContainerShape, EditorError, type AttributeChange, type AttributeHandler, type CreateShape, type Shape, type ShapeElement, type ShapeProvider,
 } from "../../src/api.js";
 
 export class BoxShape extends ContainerShape {
   override get kind(): string { return "box"; }
+  override get undoMoveName(): string { return this.commandName; }
+
+  override get creationDetails(): string {
+    return " (g#" + this.id + " + rect#" + this.part("rect").id + " + text#" + this.part("label").id + ")";
+  }
+
   override get canUngroup(): boolean { return false; }
 
   protected override svgMetadata(): string { return ' data-kind="box"'; }
@@ -65,10 +71,22 @@ export class BoxAttributes implements AttributeHandler {
     return shape instanceof BoxShape && (attr === "fill" || attr === "label");
   }
 
-  apply(shape: Shape, attr: string, value: string): void {
+  apply(shape: Shape, attr: string, value: string): AttributeChange {
     if (!(shape instanceof BoxShape)) throw new EditorError("expected a box");
-    if (attr === "fill") shape.part("rect").setAttribute("fill", value);
-    else if (attr === "label") shape.part("label").setAttribute("text", value);
-    else throw new EditorError("unknown attribute: " + attr);
+    if (attr === "fill") {
+      const rect = shape.part("rect");
+      rect.setAttribute("fill", value);
+      return { message: shape.commandName + " fill propagated to " + rect.id };
+    }
+    if (attr === "label") {
+      const label = shape.part("label");
+      const previous = label.textContent;
+      label.setAttribute("text", value);
+      return {
+        message: shape.commandName + ' label updated: "' + value + '"',
+        undoMessage: previous === undefined ? undefined : shape.commandName + ' label restored: "' + previous + '"',
+      };
+    }
+    throw new EditorError("unknown attribute: " + attr);
   }
 }
