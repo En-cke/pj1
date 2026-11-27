@@ -17,7 +17,7 @@ test("nested group, unnamed leaf and exact source ranges", () => {
 
 test("edited text is reparsed; incomplete XML clears and then recovers", () => {
   assert.equal(parseOutline('<svg><g id="before"/></svg>')[0].children[0].name, "g#before");
-  for (const xml of ["<svg><g", "<svg><g></svg>", "", "<svg/><svg/>", "<html/>"]) {
+  for (const xml of ["<svg><g", "<svg><g></svg>", "", "<svg/><svg/>", "<html/>", '<html id="wrong:svg"/>']) {
     assert.deepEqual(parseOutline(xml), []);
   }
   assert.equal(parseOutline('<svg><g id="after"/></svg>')[0].children[0].name, "g#after");

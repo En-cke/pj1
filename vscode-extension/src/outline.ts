@@ -14,11 +14,13 @@ export function parseOutline(xml: string): SvgSymbol[] {
   const stack: SvgSymbol[] = [];
   const parser = new SaxesParser();
   let start = 0;
+  let rootTag = "";
 
   parser.on("opentagstart", () => {
     start = xml.lastIndexOf("<", parser.position - 1);
   });
   parser.on("opentag", ({ name, attributes }) => {
+    if (stack.length === 0) rootTag = name;
     const id = attributes.id;
     const symbol: SvgSymbol = {
       name: id ? name + "#" + id : name,
@@ -43,5 +45,5 @@ export function parseOutline(xml: string): SvgSymbol[] {
     return [];
   }
 
-  return roots.length === 1 && /(^|:)svg(?:#|$)/.test(roots[0].name) ? roots : [];
+  return roots.length === 1 && /(^|:)svg$/.test(rootTag) ? roots : [];
 }

@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import ts from "typescript";
 
-const [base = "final", target = "p2", output = "docs/metrics"] = process.argv.slice(2);
+const [base = "final", target = "p2", output = "docs/metrics", targetLabel = target] = process.argv.slice(2);
 const git = (...args) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
 
 function category(file, phase1) {
@@ -15,7 +15,7 @@ function category(file, phase1) {
 
 function responsibility(file) {
   const name = file.split("/").at(-1).replace(/\.ts$/, "");
-  if (name.endsWith("Command")) return "命令 " + name.slice(0, -7);
+  if (name !== "Command" && name !== "EditingCommand" && name.endsWith("Command")) return "命令 " + name.slice(0, -7);
   if (name.endsWith("Shape")) return "领域图形 " + name;
   if (file.endsWith("/index.ts")) return "注册 " + file.split("/").at(-2) + " 扩展";
   return ({
@@ -67,9 +67,9 @@ const groups = ["内核", "装配处", "插件", "CLI 合计", "VS Code"];
 const table = [
   "# SVG 编辑器源码指标",
   "",
-  "从 Git 树读取 " + base + " 和 " + target + " 的 TypeScript 运行源码。LOC 含空行与注释。每个有函数体的函数记 1，分支、循环、case、catch、条件表达式和短路表达式各加 1，包括顶层决策。排除测试、构建产物和依赖。Phase 1 尚未插件化，原图形与命令按重构后的职责归类。",
+  "从 Git 树读取 " + base + " 和 " + targetLabel + " 的 TypeScript 运行源码。LOC 含空行与注释。每个有函数体的函数记 1，分支、循环、case、catch、条件表达式和短路表达式各加 1，包括顶层决策。排除测试、构建产物和依赖。Phase 1 尚未插件化，原图形与命令按重构后的职责归类。",
   "",
-  "| 分类 | " + base + " LOC | " + target + " LOC | LOC Δ | " + base + " 圈复杂度 | " + target + " 圈复杂度 | 圈复杂度 Δ |",
+  "| 分类 | " + base + " LOC | " + targetLabel + " LOC | LOC Δ | " + base + " 圈复杂度 | " + targetLabel + " 圈复杂度 | 圈复杂度 Δ |",
   "|---|---:|---:|---:|---:|---:|---:|",
 ];
 for (const category of groups) {
@@ -78,7 +78,7 @@ for (const category of groups) {
     .reduce(({ loc, cc }, entry) => ({ loc: loc + entry.loc, cc: cc + entry.cc }), {loc: 0, cc: 0}));
   table.push("| " + [category, a.loc, b.loc, b.loc - a.loc, a.cc, b.cc, b.cc - a.cc].join(" | ") + " |");
 }
-for (const [ref, inventory] of [[base, inventories[0]], [target, inventories[1]]]) {
+for (const [ref, inventory] of [[base, inventories[0]], [targetLabel, inventories[1]]]) {
   table.push("", "## " + ref + " 文件清单", "", "| 文件 | 分类 | 职责 | LOC | 圈复杂度 |", "|---|---|---|---:|---:|");
   for (const {file, category, role, loc, cc} of inventory) {
     table.push("| " + [file, category, role, loc, cc].join(" | ") + " |");
